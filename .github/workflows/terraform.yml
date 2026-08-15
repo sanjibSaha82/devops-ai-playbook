@@ -25,7 +25,8 @@ jobs:
         run: |
           echo "Repository: $GITHUB_REPOSITORY"
           echo "Ref: $GITHUB_REF"
-          echo "Event: $GITHUB_EVENT_NAME      
+          echo "Event: $GITHUB_EVENT_NAME"
+          
       - name: Check AWS Role Secret
         env:
           AWS_ROLE: ${{ secrets.AWS_TERRAFORM_ROLE_ARN_ROLE }}
