@@ -13,11 +13,12 @@ on:
 
   workflow_dispatch:
 
-
+permissions:
+  id-token: write
+  contents: read
 
 env:
   AWS_REGION: ap-south-1
-  AWS_TERRAFORM_ROLE_ARN: arn:aws:iam::360273707123:role/github-action-role
   TF_WORKING_DIR: projects/Infrastructure
 
 jobs:
@@ -40,7 +41,7 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ env.AWS_TERRAFORM_ROLE_ARN }}
+          role-to-assume: ${{ secrets.AWS_TERRAFORM_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
 
       # 3. Verify AWS identity
