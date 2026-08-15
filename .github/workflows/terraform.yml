@@ -25,7 +25,18 @@ jobs:
         run: |
           echo "Repository: $GITHUB_REPOSITORY"
           echo "Ref: $GITHUB_REF"
-          echo "Event: $GITHUB_EVENT_NAME"
+          echo "Event: $GITHUB_EVENT_NAME      
+      - name: Check AWS Role Secret
+        env:
+          AWS_ROLE: ${{ secrets.AWS_TERRAFORM_ROLE_ARN_ROLE }}
+        run: |
+          if [ -z "$AWS_ROLE" ]; then
+            echo "ERROR: AWS_TERRAFORM_ROLE_ARN is empty or unavailable"
+            exit 1
+          fi
+
+          echo "AWS role secret is available"
+          echo "Role ARN: ${AWS_ROLE}"
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
