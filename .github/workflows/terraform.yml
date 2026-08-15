@@ -1,0 +1,75 @@
+name: Terraform AWS Infrastructure
+
+on:
+  pull_request:
+    paths:
+      - "projects/Infrastructure/**"
+
+  push:
+    branches:
+      - main
+    paths:
+      - "projects/Infrastructure/**"
+
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: ap-south-1
+  TF_WORKING_DIR: projects/Infrastructure
+
+jobs:
+
+  terraform:
+    name: Terraform
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ${{ env.TF_WORKING_DIR }}
+
+    steps:
+
+      # 1. Download repository code
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # 2. Authenticate to AWS using GitHub OIDC
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_TERRAFORM_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # 3. Verify AWS identity
+      - name: Verify AWS Identity
+        run: |
+          aws sts get-caller-identity
+
+      # 4. Install Terraform
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      # 5. Terraform formatting
+      - name: Terraform Format
+        run: terraform fmt -check -recursive
+
+      # 6. Terraform initialization
+      - name: Terraform Init
+        run: terraform init
+
+      # 7. Validate Terraform
+      - name: Terraform Validate
+        run: terraform validate
+
+      # 8. Terraform Plan
+      - name: Terraform Plan
+        run: terraform plan -out=tfplan
+
+      # 9. Apply only after merge to main
+      - name: Terraform Apply
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: terraform apply -auto-approve tfplan
