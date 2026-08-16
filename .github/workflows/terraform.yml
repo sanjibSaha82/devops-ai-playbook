@@ -43,10 +43,6 @@ jobs:
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform plan
 
-      - name: Terraform Apply
-        working-directory: ${{ env.TF_WORKING_DIR }}
-        run: terraform apply -auto-approve
-
       - name: Terraform Destroy
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform destroy -auto-approve
